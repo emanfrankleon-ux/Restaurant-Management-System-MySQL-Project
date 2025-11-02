@@ -1,0 +1,24 @@
+Restaurant Management System (MySQL):
+
+Project Description:
+This project is a Restaurant Management System built using MySQL. It efficiently handles key restaurant operations including customers, menu items, tables, orders, and employees. The system demonstrates database design, normalization, relationships, and advanced SQL queries, making it an ideal project for learning and practicing real-world database management.
+
+SQL Concepts Used:
+•	DDL Commands: CREATE, ALTER, DROP
+•	DML Commands: INSERT, UPDATE, DELETE
+•	Constraints: PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE
+•	Joins: INNER JOIN, LEFT JOIN
+•	Aggregation Functions: SUM, AVG, COUNT, MAX, MIN
+•	Filtering: WHERE, LIKE, BETWEEN
+•	Sorting & Grouping: ORDER BY, GROUP BY, HAVING
+
+Features:
+•	Customer Management: Store and manage customer details.
+•	Order Management: Track orders and order details efficiently.
+•	Table Management: Manage restaurant tables (Available, Reserved, Occupied).
+•	Employee Management: Maintain employee records.
+•	Menu Management: View menu items with categories and prices.
+•	Sales & Performance Analysis: Generate reports and insights.
+•	Practice SQL Skills: Perform joins, aggregates, subqueries, grouping, and other SQL queries.
+
+
