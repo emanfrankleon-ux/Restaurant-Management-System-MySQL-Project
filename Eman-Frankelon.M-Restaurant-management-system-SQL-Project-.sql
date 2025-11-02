@@ -1,0 +1,154 @@
+-- Create Database 'Project' 
+CREATE DATABASE RESTAURENT_MANAGEMENT ;
+USE  RESTAURENT_MANAGEMENT ;
+
+-- Create Table "MenuItems"
+CREATE TABLE MenuItems (
+    MenuItemID INT AUTO_INCREMENT PRIMARY KEY,
+    ItemName VARCHAR(100),
+    Category VARCHAR(50),
+    Price DECIMAL(10,2));
+
+-- Create Table "Tables"
+CREATE TABLE Tables 
+(TableID INT AUTO_INCREMENT PRIMARY KEY,
+TableNumber INT UNIQUE,
+Capacity INT,
+IsAvailable BOOLEAN DEFAULT TRUE);
+
+-- Create Table "Customers"
+CREATE TABLE customers
+    (CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerName VARCHAR(100),
+    Phone VARCHAR(15),
+    Email VARCHAR(100));
+
+-- Create Table "Reservations"
+CREATE TABLE Reservations 
+    (ReservationID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT,
+    TableID INT,
+    ReservationTime DATETIME);
+
+-- Create table "Orders"
+CREATE TABLE Orders 
+    (OrderID INT AUTO_INCREMENT PRIMARY KEY,
+    TableID INT,
+    CustomerID INT,
+    OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    TotalAmount DECIMAL(10,2));
+
+-- Create Table "OrderDetails"
+CREATE TABLE OrderDetails 
+    (OrderDetailID INT AUTO_INCREMENT PRIMARY KEY,
+    OrderID INT,
+    ReservationID INT,
+    MenuItemID INT,
+    Quantity INT,
+    FOREIGN KEY (MenuItemID) REFERENCES MenuItems(MenuItemID),
+    FOREIGN KEY (ReservationID) REFERENCES Reservations(ReservationID),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID));
+
+-- Insert value into each tables
+INSERT INTO MenuItems (ItemName, Category, Price) VALUES
+('Grilled Chicken Breast', 'Main Course', 329.00),
+('Spicy Chicken Wings', 'Starter', 249.00),
+('BBQ Pork Ribs', 'Main Course', 499.00),
+('Pork Dumplings', 'Starter', 199.00),
+('Beef Steak', 'Main Course', 599.00),
+('Beef Burger', 'Main Course', 349.00),
+('Chicken Caesar Salad', 'Salad', 229.00),
+('Beef Noodle Soup', 'Main Course', 279.00),
+('Pork Fried Rice', 'Main Course', 259.00),
+('Chicken Curry', 'Main Course', 319.00);
+SELECT *FROM MENUITEMS ;
+
+INSERT INTO Tables (TABLENUMBER, CAPACITY, ISAVAILABLE) VALUES
+(1, 2, TRUE),
+(2, 4, TRUE),
+(3, 6, FALSE),
+(4, 2, TRUE),
+(5, 8, FALSE);
+SELECT * FROM TABLES;
+
+SHOW TABLES;
+
+INSERT INTO Customers (CUSTOMERNAME, PHONE, EMAIL) VALUES 
+('Messi', '+447911123456', 'messi.uk@gmail.com'),
+('Neymar', '+447922234567', 'neymar.uk@gmail.com'),
+('Oliver Khan', '+447933345678', 'oliverkhan.uk@gmail.com'),
+('Pele', '+447944456789', 'pele.uk@gmail.com'),
+('KaviPriyan', '+447955567890', 'kavipriyan.uk@gmail.com');
+SELECT * FROM CUSTOMERS ;
+
+INSERT INTO Reservations (CustomerID, TableID, ReservationTime) VALUES
+(1, 2, '2025-10-23 13:30:00'),
+(2, 1, '2025-10-23 14:30:00'),
+(3, 3, '2025-10-24 13:00:00'),
+(4, 4, '2025-10-24 15:30:00'),
+(5, 5, '2025-10-25 14:00:00');
+SELECT * FROM RESERVATIONS ;
+
+INSERT INTO Orders (TableID, CustomerID, TotalAmount)
+VALUES 
+(1, 1, '£5.00'),
+(2, 2, '£3.00'),
+(3, 3, '£7.50'),
+(4, 4, '£2.00'),
+(5, 5, '£4.50');
+SELECT * FROM ORDERS;
+
+INSERT INTO OrderDetails (OrderID, ReservationID, MenuItemID, Quantity) VALUES
+(1, 1, 2, 1),
+(1, 4, 1, 2),
+(2, 3, 3, 2),
+(3, 1, 4, 1),
+(3, 5, 2, 2),
+(4, 2, 1, 1),
+(4, 4, 5, 1),
+(5, 1, 2, 1),
+(5, 2, 3, 1),
+(5, 5, 5, 1);
+SELECT * FROM OrderDetails;
+
+
+-- USING JOINS
+SELECT O.ORDERID,C.CUSTOMERID,O.TOTALAMOUNT,O.ORDERDATE FROM ORDERS O 
+JOIN CUSTOMERS C ON O.CUSTOMERID = C.CUSTOMERID;
+
+-- USING VIEW
+CREATE VIEW RESERVATIONDETAILS AS 
+SELECT R.RESERVATIONID,C.CUSTOMERNAME,T.TABLENUMBER,R.RESERVATIONTIME FROM RESERVATIONS R JOIN CUSTOMERS C 
+ON R.CUSTOMERID = C.CUSTOMERID JOIN TABLES T ON R.TABLEID= T. TABLEID;
+
+SELECT * FROM RESERVATIONDETAILS;
+
+SELECT CUSTOMERNAME 
+FROM CUSTOMERS WHERE CUSTOMERID IN ( SELECT CUSTOMERID FROM ORDERS 
+WHERE TOTALAMOUNT >(SELECT AVG(TOTALAMOUNT) FROM ORDERS) );
+
+-- USING TRIGGER
+DELIMITER $$
+CREATE TRIGGER AFTERRESERVATION
+AFTER INSERT ON RESERVATIONS
+FOR EACH ROW
+BEGIN
+UPDATE TABLES
+SET ISAVAILABLE = FALSE 
+WHERE TABLEID = NEW.TABLEID;
+END $$
+DELIMITER ;
+
+SELECT * FROM TABLES WHERE TABLEID = 2;
+
+DELIMITER // 
+CREATE PROCEDURE GETCUSTOMERORDERCOUNT(IN CUST_ID INT)
+BEGIN
+SELECT C.CUSTOMERNAME, COUNT(O.ORDERID) AS TOTALORDERS FROM CUSTOMERS C LEFT JOIN ORDERS O ON
+C.CUSTOMERID = O.CUSTOMERID WHERE C.CUSTOMERID = CUST_ID GROUP BY C.CUSTOMERNAME;
+END//
+
+-- TO EXECUTE TRIGGER
+CALL GETCUSTOMERORDERCOUNT(1);
+
+
